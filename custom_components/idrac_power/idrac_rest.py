@@ -22,6 +22,7 @@ _LOGGER = logging.getLogger(__name__)
 protocol = 'https://'
 drac_managers_path = '/redfish/v1/Managers/iDRAC.Embedded.1'
 drac_chassis_path = '/redfish/v1/Chassis/System.Embedded.1'
+drac_system_path = '/redfish/v1/Systems/System.Embedded.1'
 drac_powercontrol_path = '/redfish/v1/Chassis/System.Embedded.1/Power/PowerControl'
 drac_reset_path = '/redfish/v1/Systems/System.Embedded.1/Actions/ComputerSystem.Reset'
 drac_thermals = '/redfish/v1/Chassis/System.Embedded.1/Thermal'
@@ -248,26 +249,31 @@ class IdracRest:
                 callback(self.thermal_values)
         return self.thermal_values
 
+
     def update_status(self):
-        try:
-            result = self.get_path(drac_chassis_path)
-            handle_error(result)
-            status_values = result.json()
+    try:
+        result = self.get_path(drac_system_path)
+        handle_error(result)
+        status_values = result.json()
 
-            try:
-                new_status = status_values[JSON_STATUS][JSON_STATUS_STATE] == 'Enabled'
-            except:
-                new_status = None
+        power_state = status_values.get("PowerState")
 
-        except (RequestException, RedfishConfig, CannotConnect) as e:
-            _LOGGER.debug(f"Couldn't update {self.host} status: {e}")
+        if power_state == "On":
+            new_status = True
+        elif power_state == "Off":
+            new_status = False
+        else:
             new_status = None
 
-        if new_status != self.status:
-            self.status = new_status
-            for callback in self.callback_status:
-                callback(self.status)
+    except (RequestException, RedfishConfig, CannotConnect) as e:
+        _LOGGER.debug(f"Couldn't update {self.host} status: {e}")
+        new_status = None
 
+    if new_status != self.status:
+        self.status = new_status
+        for callback in self.callback_status:
+            callback(self.status)
+            
     def update_power_usage(self):
         try:
             result = self.get_path(drac_powercontrol_path)
@@ -300,6 +306,7 @@ class IdracRest:
         except Exception as e:
             _LOGGER.debug(f"Couldn't update {self.host} energy consumption: {e}")
             # Don't set callbacks to None if we just can't find the energy data
+        self.update_status()
 
 
 class CannotConnect(HomeAssistantError):
