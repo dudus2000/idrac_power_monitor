@@ -295,18 +295,8 @@ class IdracRest:
         except:
             pass
             
-        # Get energy consumption using the data endpoint approach
-        try:
-            energy_value = self.get_energy_consumption_via_data_endpoint()
-            
-            if energy_value is not None and energy_value != self.energy_consumption:
-                self.energy_consumption = energy_value
-                for callback in self.callback_energy_consumption:
-                    callback(self.energy_consumption)
-        except Exception as e:
-            _LOGGER.debug(f"Couldn't update {self.host} energy consumption: {e}")
-            # Don't set callbacks to None if we just can't find the energy data
-            self.update_status()
+        # Skip slow iDRAC /data energy endpoint
+        self.update_status()
 
 
 class CannotConnect(HomeAssistantError):
