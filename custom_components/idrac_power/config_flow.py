@@ -8,7 +8,7 @@ from typing import Any
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD
-from homeassistant.core import HomeAssistant as hass
+from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 
 from .const import (
@@ -80,7 +80,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 interval=data[CONF_INTERVAL],
             )
 
-        device_info = await hass.async_add_executor_job(self.hass, target=rest_client.get_device_info)
+        device_info = await hass.async_add_executor_job(target=rest_client.get_device_info)
         model_name = device_info[JSON_MODEL]
 
         return dict(model_name=model_name)
