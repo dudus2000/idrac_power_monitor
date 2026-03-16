@@ -306,7 +306,7 @@ class IdracRest:
         except Exception as e:
             _LOGGER.debug(f"Couldn't update {self.host} energy consumption: {e}")
             # Don't set callbacks to None if we just can't find the energy data
-        self.update_status()
+            self.update_status()
 
 
 class CannotConnect(HomeAssistantError):
