@@ -252,7 +252,7 @@ class IdracRest:
 
     def update_status(self):
         try:
-            result = self.get_path(drac_system_path)
+            result = self.get_path(drac_chassis_path)
             handle_error(result)
             status_values = result.json()
 
