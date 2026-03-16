@@ -92,9 +92,10 @@ class IdracStatusBinarySensor(BinarySensorEntity):
         return "Server Status"
 
     def update_value(self, status: bool | None):
-        if status:
-            self._attr_is_on = status
-            self._attr_available = True
-        else:
-            self._attr_available = False
-        self.schedule_update_ha_state()
+    if status is None:
+        self._attr_available = False
+    else:
+        self._attr_is_on = status
+        self._attr_available = True
+
+    self.schedule_update_ha_state()
