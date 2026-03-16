@@ -298,6 +298,9 @@ class IdracRest:
         # Skip slow iDRAC /data energy endpoint
         self.update_status()
 
+        # update thermal sensors
+        self.update_thermals()
+
 
 class CannotConnect(HomeAssistantError):
     """Error to indicate we cannot connect."""
