@@ -251,28 +251,28 @@ class IdracRest:
 
 
     def update_status(self):
-    try:
-        result = self.get_path(drac_system_path)
-        handle_error(result)
-        status_values = result.json()
+        try:
+            result = self.get_path(drac_system_path)
+            handle_error(result)
+            status_values = result.json()
 
-        power_state = status_values.get("PowerState")
+            power_state = status_values.get("PowerState")
 
-        if power_state == "On":
-            new_status = True
-        elif power_state == "Off":
-            new_status = False
-        else:
+            if power_state == "On":
+                new_status = True
+            elif power_state == "Off":
+                new_status = False
+            else:
+                new_status = None
+
+        except (RequestException, RedfishConfig, CannotConnect) as e:
+            _LOGGER.debug(f"Couldn't update {self.host} status: {e}")
             new_status = None
 
-    except (RequestException, RedfishConfig, CannotConnect) as e:
-        _LOGGER.debug(f"Couldn't update {self.host} status: {e}")
-        new_status = None
-
-    if new_status != self.status:
-        self.status = new_status
-        for callback in self.callback_status:
-            callback(self.status)
+        if new_status != self.status:
+            self.status = new_status
+            for callback in self.callback_status:
+                callback(self.status)
             
     def update_power_usage(self):
         try:
