@@ -80,7 +80,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 interval=data[CONF_INTERVAL],
             )
 
-        device_info = await hass.async_add_executor_job(target=rest_client.get_device_info)
+        device_info = await self.hass.async_add_executor_job(rest_client.get_device_info)
         model_name = device_info[JSON_MODEL]
 
         return dict(model_name=model_name)
